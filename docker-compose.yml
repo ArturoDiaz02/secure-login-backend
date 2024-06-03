@@ -1,0 +1,35 @@
+version: "3.1"
+
+# postgres and dockerfile
+services:
+  postgres:
+    image: postgres:12
+    container_name: security-db
+    environment:
+      POSTGRES_USER: secureloguser
+      POSTGRES_PASSWORD: securelogpassword
+      POSTGRES_DB: postgres
+    ports:
+      - "5432"
+    networks:
+      - securitynetwork
+
+  back-end:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: security-backend
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8090"
+    environment:
+      - POSTGRES_USER=secureloguser
+      - POSTGRES_PASSWORD=securelogpassword
+      - POSTGRES_HOST=postgres:5432
+    networks:
+        - securitynetwork
+
+networks:
+  securitynetwork:
+    driver: bridge
